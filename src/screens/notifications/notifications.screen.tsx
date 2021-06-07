@@ -174,7 +174,6 @@ export class NotificationsScreen extends React.Component<Props, State> {
         if (!profile) {
             profile = getAnonymousProfile(p_notification.Metadata.TransactorPublicKeyBase58Check);
         }
-
         return profile;
     }
 
@@ -254,8 +253,7 @@ export class NotificationsScreen extends React.Component<Props, State> {
 
     renderNotification(p_notification: Notification): any {
         if (p_notification?.Metadata) {
-            const postHashHex = p_notification.Metadata.LikeTxindexMetadata?.PostHashHex as string;
-            const post = this.state.posts[postHashHex]
+
             const profile = this.getProfile(p_notification)
             switch (p_notification.Metadata.TxnType) {
                 case NotificationType.Follow:
@@ -270,15 +268,17 @@ export class NotificationsScreen extends React.Component<Props, State> {
                         notification={p_notification}
                         goToProfile={this.goToProfile} profile={profile}
                     />
-                case NotificationType.Like:
+                case NotificationType.Like: {
+                    const postHashHex = p_notification.Metadata.LikeTxindexMetadata?.PostHashHex as string;
                     return <LikeNotificationComponent
                         styles={styles}
-                        post={post}
+                        post={this.state.posts[postHashHex]}
                         notification={p_notification}
                         goToPost={this.goToPost}
                         goToProfile={this.goToProfile}
                         profile={profile}
                     />
+                }
                 case NotificationType.CreatorCoin:
                     return <CreatorCoinNotificationComponent
                         styles={styles}
@@ -287,13 +287,14 @@ export class NotificationsScreen extends React.Component<Props, State> {
                         profile={profile} />
 
                 case NotificationType.CreatorCoinTransfer:
+                    const postHashHex = p_notification.Metadata.CreatorCoinTransferTxindexMetadata?.PostHashHex as string;
                     return <CreatorCoinTransferNotificationComponent
                         profile={profile}
                         notification={p_notification}
                         goToProfile={this.goToProfile}
                         goToPost={this.goToPost}
                         styles={styles}
-                        post={post}
+                        post={this.state.posts[postHashHex]}
                     />
                 case NotificationType.SubmitPost:
                     return this.renderSubmitPostNotification(p_notification);
