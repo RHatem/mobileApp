@@ -82,7 +82,7 @@ export class NotificationsScreen extends React.Component<Props, State> {
                                     isLoading: false,
                                     refreshing: false,
                                     posts: p_response.PostsByHash
-                                })
+                                });
                             }
                         }
                     );
@@ -96,7 +96,7 @@ export class NotificationsScreen extends React.Component<Props, State> {
 
             if (newLastNotificationIndex !== 0) {
                 if (this._isMounted) {
-                    this.setState({ isLoadingMore: true })
+                    this.setState({ isLoadingMore: true });
                 }
 
                 api.getNotifications(globals.user.publicKey, newLastNotificationIndex - 1, 50).then(
@@ -110,13 +110,13 @@ export class NotificationsScreen extends React.Component<Props, State> {
                                 refreshing: false,
                                 profiles: Object.assign(p_previousValue.profiles, p_response.ProfilesByPublicKey),
                                 posts: Object.assign(p_previousValue.posts, p_response.PostsByHash)
-                            }))
+                            }));
                         }
                     }
                 ).catch(p_error => globals.defaultHandleError(p_error)).finally(
                     () => {
                         if (this._isMounted) {
-                            this.setState({ isLoadingMore: false })
+                            this.setState({ isLoadingMore: false });
                         }
                     }
                 );
@@ -125,12 +125,12 @@ export class NotificationsScreen extends React.Component<Props, State> {
     }
 
     componentDidMount() {
-        this.setState({ init: true })
+        this.setState({ init: true });
         this.loadNotifications(true);
     }
 
     componentWillUnmount() {
-        this._isMounted = false
+        this._isMounted = false;
     }
 
     goToProfile(p_userKey: string, p_username: string) {
