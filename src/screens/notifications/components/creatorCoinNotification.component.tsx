@@ -15,11 +15,11 @@ interface Props {
 
 export class CreatorCoinNotificationComponent extends React.Component<Props> {
     constructor(props: Props) {
-        super(props)
+        super(props);
     }
 
     shouldComponentUpdate(p_nextProps: Props) {
-        return p_nextProps.notification?.Index !== this.props.notification?.Index
+        return p_nextProps.notification?.Index !== this.props.notification?.Index;
     }
 
     render() {

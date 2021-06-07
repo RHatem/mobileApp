@@ -14,11 +14,11 @@ interface Props {
 
 export class FollowNotificationComponent extends React.Component<Props> {
     constructor(props: Props) {
-        super(props)
+        super(props);
     }
 
     shouldComponentUpdate(p_nextProps: Props) {
-        return p_nextProps.notification?.Index !== this.props.notification?.Index
+        return p_nextProps.notification?.Index !== this.props.notification?.Index;
     }
 
     render() {
@@ -41,10 +41,10 @@ export class FollowNotificationComponent extends React.Component<Props> {
                         style={this.props.styles.centerTextVertically}
                         onPress={() => this.props.goToProfile(this.props.profile.PublicKeyBase58Check, this.props.profile.Username)}
                         activeOpacity={1}>
-                        <Text style={[this.props.styles.usernameText, themeStyles.fontColorMain]}>{
-                            this.props.notification.Metadata.FollowTxindexMetadata?.IsUnfollow ? 'unfollowed' : 'followed'
-                        } </Text>
+                        <Text style={[this.props.styles.usernameText, themeStyles.fontColorMain]}>
+                            {this.props.profile.Username} </Text>
                     </TouchableOpacity>
+
                     <Text style={[globalStyles.fontWeight500, themeStyles.fontColorMain]}>{this.props.notification.Metadata.FollowTxindexMetadata?.IsUnfollow ? 'unfollowed' : 'followed'} you</Text>
                 </View>
             </TouchableOpacity>

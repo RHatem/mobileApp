@@ -20,11 +20,11 @@ export class PostRecloutNotificationComponent extends React.Component<Props> {
         super(props)
         this.state = {
             notification: this.props.notification
-        }
+        };
     }
 
     shouldComponentUpdate(p_nextProps: Props) {
-        return p_nextProps.notification?.Index !== this.props.notification?.Index
+        return p_nextProps.notification?.Index !== this.props.notification?.Index;
     }
 
     render() {

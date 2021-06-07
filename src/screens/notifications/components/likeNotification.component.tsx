@@ -16,16 +16,16 @@ interface Props {
 
 export class LikeNotificationComponent extends React.Component<Props> {
     constructor(props: Props) {
-        super(props)
+        super(props);
     }
 
     shouldComponentUpdate(p_nextProps: Props) {
-        return p_nextProps.notification?.Index !== this.props.notification?.Index
+        return p_nextProps.notification?.Index !== this.props.notification?.Index;
     }
 
     render() {
         const postHashHex = this.props.notification.Metadata.LikeTxindexMetadata?.PostHashHex as string;
-        const likedText = this.props.notification.Metadata.LikeTxindexMetadata?.IsUnlike ? 'unliked' : 'liked'
+        const likedText = this.props.notification.Metadata.LikeTxindexMetadata?.IsUnlike ? 'unliked' : 'liked';
         return (
             <TouchableOpacity
                 style={[this.props.styles.notificationContainer, this.props.styles.centerTextVertically, themeStyles.containerColorMain, themeStyles.borderColor]}
