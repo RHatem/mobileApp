@@ -9,13 +9,13 @@ import { globalStyles } from "@styles/globalStyles";
 import { FontAwesome } from '@expo/vector-icons';
 
 interface Props {
-    profile: Profile,
-    post: Post,
-    goToProfile: (p_userKey: string, p_username: string) => void,
-    goToPost: (parentPoshHashHex: string, postHashCode: string) => void,
-    postHashHex: string,
-    styles: any,
-    notification: Notification
+    profile: Profile;
+    post: Post;
+    goToProfile: (p_userKey: string, p_username: string) => void;
+    goToPost: (parentPoshHashHex: string, postHashCode: string) => void;
+    postHashHex: string;
+    styles: any;
+    notification: Notification;
 }
 
 export class PostReplyNotificationComponent extends React.Component<Props> {
@@ -40,11 +40,9 @@ export class PostReplyNotificationComponent extends React.Component<Props> {
                     activeOpacity={1}>
                     <Image style={this.props.styles.profilePic} source={{ uri: this.props.profile.ProfilePic }} />
                 </TouchableOpacity>
-
                 <View style={[this.props.styles.iconContainer, { backgroundColor: '#3599d4' }]}>
                     <FontAwesome style={[{ marginLeft: 1 }]} name="comment" size={12} color="white" />
                 </View>
-
                 <View style={this.props.styles.textContainer}>
                     <TouchableOpacity
                         style={this.props.styles.centerTextVertically}
@@ -52,12 +50,10 @@ export class PostReplyNotificationComponent extends React.Component<Props> {
                         activeOpacity={1}>
                         <Text style={[this.props.styles.usernameText, themeStyles.fontColorMain]}>{this.props.profile.Username} </Text>
                     </TouchableOpacity>
-
                     <Text style={[globalStyles.fontWeight500, themeStyles.fontColorMain]}>replied to your post: </Text>
                     <Text style={[this.props.styles.postText, themeStyles.fontColorSub]} numberOfLines={1}>{this.props.post?.Body}</Text>
                 </View>
             </TouchableOpacity>
         )
     }
-
 };

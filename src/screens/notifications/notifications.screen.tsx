@@ -1,42 +1,74 @@
-import React, { useEffect, useState } from 'react';
-import { FlatList, Text, View, StyleSheet, Image, ActivityIndicator, Dimensions, RefreshControl, TouchableOpacity } from 'react-native';
-import { FontAwesome } from '@expo/vector-icons';
+import React from 'react';
+import { FlatList, Text, View, StyleSheet, ActivityIndicator, Dimensions, RefreshControl } from 'react-native';
 import { globals, navigatorGlobals } from '@globals';
 import { Notification, NotificationType, Post, Profile } from '@types';
 import { api, getAnonymousProfile, loadTickersAndExchangeRate } from '@services';
-import { globalStyles, themeStyles } from '@styles';
+import { themeStyles } from '@styles';
 import { FollowNotificationComponent } from './components/followNotification.component';
 import { BasicTransferNotificationComponent } from './components/basicTransferNotification.component';
 import { LikeNotificationComponent } from './components/likeNotification.component';
 import { CreatorCoinNotificationComponent } from './components/creatorCoinNotification.component';
 import { CreatorCoinTransferNotificationComponent } from './components/creatorCoinTransferNotification.component';
-
 import { PostReplyNotificationComponent } from './components/postReplyNotification.component';
 import { PostMentionNotificationComponent } from './components/postMentionNotification.component';
 import { PostRecloutNotificationComponent } from './components/postRecloutNotification.component';
+import { NavigationProp } from '@react-navigation/native';
 
 
-export function NotificationsScreen({ navigation }: any) {
-    const [isLoading, setLoading] = useState(true);
-    const [notifications, setNotifications] = useState<Notification[]>([]);
-    const [profiles, setProfiles] = useState<{ [key: string]: Profile }>({});
-    const [posts, setPosts] = useState<{ [key: string]: Post }>({});
-    const [refreshing, setRefreshing] = React.useState(false);
-    const [isLoadingMore, setLoadingMore] = useState(false);
-    const [lastNotificationIndex, setLastNotificationIndex] = useState(-999);
-    const [init, setInit] = useState(false);
+interface Props {
+    standardPublicKey: string;
+    nonStandardPublicKey?: string;
+    back: () => void;
+    selectAccount: (publicKey: string) => void;
+    navigation: NavigationProp<any>;
+}
 
-    let mount = true;
+interface State {
+    isLoading: boolean;
+    notifications: Notification[];
+    profiles: { [key: string]: Profile };
+    posts: { [key: string]: Post };
+    refreshing: boolean;
+    isLoadingMore: boolean;
+    lastNotificationIndex: number;
+    init: boolean;
+}
 
-    navigatorGlobals.refreshNotifications = loadNotifications;
+export class NotificationsScreen extends React.Component<Props, State> {
 
-    function loadNotifications(p_force = false) {
-        if (!init && !p_force) {
+    private mount = true;
+
+    constructor(props: Props) {
+        super(props);
+
+        this.state = {
+            isLoading: true,
+            notifications: [],
+            profiles: {},
+            posts: {},
+            refreshing: false,
+            isLoadingMore: false,
+            lastNotificationIndex: -999,
+            init: false,
+        };
+
+        this.loadNotifications = this.loadNotifications.bind(this);
+        this.loadMoreNotifications = this.loadMoreNotifications.bind(this);
+        this.goToProfile = this.goToProfile.bind(this);
+        this.goToPost = this.goToPost.bind(this);
+        this.getProfile = this.getProfile.bind(this);
+        this.renderSubmitPostNotification = this.renderSubmitPostNotification.bind(this);
+        this.renderPostMentionNotification = this.renderPostMentionNotification.bind(this);
+        this.renderNotification = this.renderNotification.bind(this);
+    }
+
+    loadNotifications(p_force = false) {
+        if (!this.state.init && !p_force) {
             return;
         }
 
-        if (mount) {
-            setLoading(true);
+        if (this.mount) {
+            this.setState({ isLoading: true, });
         }
 
         api.getNotifications(globals.user.publicKey, -1, 50)
@@ -44,12 +76,12 @@ export function NotificationsScreen({ navigation }: any) {
                 p_response => {
                     loadTickersAndExchangeRate().then(
                         () => {
-                            if (mount) {
-                                setNotifications(p_response.Notifications ? p_response.Notifications : []);
-                                setProfiles(p_response.ProfilesByPublicKey);
-                                setPosts(p_response.PostsByHash);
-                                setLoading(false);
-                                setRefreshing(false);
+                            if (this.mount) {
+                                this.setState({ notifications: p_response.Notifications ? p_response.Notifications : [] })
+                                this.setState({ profiles: p_response.ProfilesByPublicKey })
+                                this.setState({ posts: p_response.PostsByHash })
+                                this.setState({ isLoading: false })
+                                this.setState({ refreshing: false })
                             }
                         }
                     );
@@ -57,31 +89,33 @@ export function NotificationsScreen({ navigation }: any) {
             ).catch(p_error => globals.defaultHandleError(p_error));
     }
 
-    function loadMoreNotifications() {
-        if (notifications?.length > 0) {
-            const newLastNotificationIndex = notifications[notifications.length - 1].Index;
+    loadMoreNotifications() {
+        if (this.state.notifications?.length > 0) {
+            const newLastNotificationIndex = this.state.notifications[this.state.notifications.length - 1].Index;
 
             if (newLastNotificationIndex !== 0) {
-                if (mount) {
-                    setLoadingMore(true);
+                if (this.mount) {
+                    this.setState({ isLoadingMore: true })
                 }
 
                 api.getNotifications(globals.user.publicKey, newLastNotificationIndex - 1, 50).then(
                     p_response => {
-                        if (mount) {
-                            const allNotifications = notifications.concat(p_response.Notifications)
-                            setNotifications(allNotifications);
-                            setProfiles(p_previousValue => Object.assign(p_previousValue, p_response.ProfilesByPublicKey));
-                            setPosts(p_previousValue => Object.assign(p_previousValue, p_response.PostsByHash));
-                            setLastNotificationIndex(newLastNotificationIndex);
-                            setLoading(false);
-                            setRefreshing(false);
+                        if (this.mount) {
+                            const allNotifications = this.state.notifications.concat(p_response.Notifications)
+                            this.setState({
+                                notifications: allNotifications,
+                                lastNotificationIndex: newLastNotificationIndex,
+                                isLoading: false,
+                                refreshing: false
+                            })
+                            this.setState((p_previousValue) => ({ profiles: Object.assign(p_previousValue, p_response.ProfilesByPublicKey) }))
+                            this.setState((p_previousValue) => ({ posts: Object.assign(p_previousValue, p_response.PostsByHash) }));
                         }
                     }
                 ).catch(p_error => globals.defaultHandleError(p_error)).finally(
                     () => {
-                        if (mount) {
-                            setLoadingMore(false);
+                        if (this.mount) {
+                            this.setState({ isLoadingMore: false })
                         }
                     }
                 );
@@ -89,22 +123,19 @@ export function NotificationsScreen({ navigation }: any) {
         }
     }
 
-    useEffect(
-        () => {
-            setInit(true);
-            loadNotifications(true);
+    componentDidMount() {
+        this.setState({ init: true })
+        this.loadNotifications(true);
+    }
 
-            return () => {
-                mount = false;
-            }
-        },
-        []
-    );
+    componentWillUnmount() {
+        this.mount = false
+    }
 
-    function goToProfile(p_userKey: string, p_username: string) {
+    goToProfile(p_userKey: string, p_username: string) {
         if (p_username !== 'anonymous') {
             try {
-                navigation.navigate(
+                this.props.navigation.navigate(
                     'AppNavigator',
                     {
                         screen: 'UserProfile',
@@ -120,9 +151,9 @@ export function NotificationsScreen({ navigation }: any) {
         }
     }
 
-    function goToPost(p_postHashHex: string, p_priorityComment?: string) {
+    goToPost(p_postHashHex: string, p_priorityComment?: string) {
         try {
-            navigation.navigate(
+            this.props.navigation.navigate(
                 'AppNavigator',
                 {
                     screen: 'Post',
@@ -137,8 +168,8 @@ export function NotificationsScreen({ navigation }: any) {
         }
     }
 
-    function getProfile(p_notification: Notification): Profile {
-        let profile = profiles[p_notification.Metadata.TransactorPublicKeyBase58Check];
+    getProfile(p_notification: Notification): Profile {
+        let profile = this.state.profiles[p_notification.Metadata.TransactorPublicKeyBase58Check];
         if (!profile) {
             profile = getAnonymousProfile(p_notification.Metadata.TransactorPublicKeyBase58Check);
         }
@@ -146,11 +177,11 @@ export function NotificationsScreen({ navigation }: any) {
         return profile;
     }
 
-    function renderSubmitPostNotification(p_notification: Notification) {
+    renderSubmitPostNotification(p_notification: Notification) {
         const postHashHex = p_notification.Metadata.SubmitPostTxindexMetadata?.PostHashBeingModifiedHex as string;
-        const profile = getProfile(p_notification);
+        const profile = this.getProfile(p_notification);
 
-        const post = posts[postHashHex];
+        const post = this.state.posts[postHashHex];
         if (!post) {
             return undefined;
         }
@@ -159,9 +190,9 @@ export function NotificationsScreen({ navigation }: any) {
             return <PostRecloutNotificationComponent
                 post={post}
                 notification={p_notification}
-                goToPost={goToPost}
+                goToPost={this.goToPost}
                 styles={styles}
-                goToProfile={goToProfile}
+                goToProfile={this.goToProfile}
                 profile={profile}
                 postHashHex={postHashHex}
             />
@@ -169,33 +200,29 @@ export function NotificationsScreen({ navigation }: any) {
             const parentPostHashHex = p_notification.Metadata.SubmitPostTxindexMetadata?.ParentPostHashHex;
 
             if (parentPostHashHex) {
-                const parentPost = posts[parentPostHashHex];
+                const parentPost = this.state.posts[parentPostHashHex];
 
                 if (parentPost && parentPost.ProfileEntryResponse.PublicKeyBase58Check === globals.user.publicKey) {
-
                     return <PostReplyNotificationComponent
                         notification={p_notification}
                         profile={profile}
                         post={post}
-                        goToProfile={goToProfile}
-                        goToPost={goToPost}
+                        goToProfile={this.goToProfile}
+                        goToPost={this.goToPost}
                         styles={styles}
                         postHashHex={postHashHex}
                     />
                 } else {
-                    return renderPostMentionNotification(p_notification, true);
+                    return this.renderPostMentionNotification(p_notification, true);
                 }
             } else {
-                return renderPostMentionNotification(p_notification, false);
+                return this.renderPostMentionNotification(p_notification, false);
             }
         }
     }
 
-
-
-    function renderPostMentionNotification(p_notification: Notification, p_withParentPost: boolean) {
-        const profile = getProfile(p_notification);
-
+    renderPostMentionNotification(p_notification: Notification, p_withParentPost: boolean) {
+        const profile = this.getProfile(p_notification);
         let parentPoshHashHex: string;
         let postHashHex: string;
         let post: Post;
@@ -204,18 +231,18 @@ export function NotificationsScreen({ navigation }: any) {
         if (p_withParentPost) {
             parentPoshHashHex = p_notification.Metadata.SubmitPostTxindexMetadata?.ParentPostHashHex as string;
             postHashHex = p_notification.Metadata.SubmitPostTxindexMetadata?.PostHashBeingModifiedHex as string;
-            post = posts[postHashHex];
+            post = this.state.posts[postHashHex];
         } else {
             parentPoshHashHex = p_notification.Metadata.SubmitPostTxindexMetadata?.PostHashBeingModifiedHex as string;
-            post = posts[parentPoshHashHex];
+            post = this.state.posts[parentPoshHashHex];
         }
 
         return (
             <PostMentionNotificationComponent
                 profile={profile}
                 post={post}
-                goToProfile={goToProfile}
-                goToPost={goToPost}
+                goToProfile={this.goToProfile}
+                goToPost={this.goToPost}
                 notification={p_notification}
                 postHashHex={postHashHex}
                 parentPoshHashHex={parentPoshHashHex}
@@ -224,91 +251,90 @@ export function NotificationsScreen({ navigation }: any) {
         );
     }
 
-
-
-    function renderNotification(p_notification: Notification): any {
+    renderNotification(p_notification: Notification): any {
         if (p_notification?.Metadata) {
             const postHashHex = p_notification.Metadata.LikeTxindexMetadata?.PostHashHex as string;
-            const post = posts[postHashHex]
-            const profile = getProfile(p_notification)
+            const post = this.state.posts[postHashHex]
+            const profile = this.getProfile(p_notification)
             switch (p_notification.Metadata.TxnType) {
                 case NotificationType.Follow:
                     return <FollowNotificationComponent
                         styles={styles}
                         profile={profile}
-                        goToProfile={goToProfile}
+                        goToProfile={this.goToProfile}
                         notification={p_notification} />
                 case NotificationType.BasicTransfer:
                     return <BasicTransferNotificationComponent
                         styles={styles}
                         notification={p_notification}
-                        goToProfile={goToProfile} profile={profile}
+                        goToProfile={this.goToProfile} profile={profile}
                     />
                 case NotificationType.Like:
                     return <LikeNotificationComponent
                         styles={styles}
                         post={post}
                         notification={p_notification}
-                        goToPost={goToPost}
-                        goToProfile={goToProfile}
+                        goToPost={this.goToPost}
+                        goToProfile={this.goToProfile}
                         profile={profile}
                     />
                 case NotificationType.CreatorCoin:
                     return <CreatorCoinNotificationComponent
                         styles={styles}
                         notification={p_notification}
-                        goToProfile={goToProfile}
+                        goToProfile={this.goToProfile}
                         profile={profile} />
 
                 case NotificationType.CreatorCoinTransfer:
-
                     return <CreatorCoinTransferNotificationComponent
                         profile={profile}
                         notification={p_notification}
-                        goToProfile={goToProfile}
-                        goToPost={goToPost}
+                        goToProfile={this.goToProfile}
+                        goToPost={this.goToPost}
                         styles={styles}
                         post={post}
                     />
                 case NotificationType.SubmitPost:
-                    return renderSubmitPostNotification(p_notification);
+                    return this.renderSubmitPostNotification(p_notification);
                 default:
                     return undefined;
             }
         }
-
         return undefined;
     }
+    render() {
+        navigatorGlobals.refreshNotifications = this.loadNotifications;
 
-    const keyExtractor = (item: any, index: number) => item.Index?.toString() + index.toString();
-    return isLoading ?
-        <View style={[styles.listContainer, themeStyles.containerColorMain]}>
-            <ActivityIndicator style={styles.activityIndicator} color={themeStyles.fontColorMain.color}></ActivityIndicator>
-        </View>
-        :
-        globals.readonly ?
-            <View style={[{ alignItems: 'center', justifyContent: 'center' }, styles.listContainer, themeStyles.containerColorSub]}>
-                <Text style={[themeStyles.fontColorMain]}>Notifications are not available in the read-only mode.</Text>
+        const keyExtractor = (item: any, index: number) => item.Index?.toString() + index.toString();
+        return this.state.isLoading ?
+            <View style={[styles.listContainer, themeStyles.containerColorMain]}>
+                <ActivityIndicator style={styles.activityIndicator} color={themeStyles.fontColorMain.color}></ActivityIndicator>
             </View>
             :
-            <View style={[styles.listContainer, themeStyles.containerColorSub]}>
-                <FlatList
-                    data={notifications}
-                    keyExtractor={keyExtractor}
-                    renderItem={({ item }) => renderNotification(item)}
-                    onEndReached={loadMoreNotifications}
-                    onEndReachedThreshold={4}
-                    maxToRenderPerBatch={20}
-                    windowSize={20}
-                    refreshControl={<RefreshControl
-                        tintColor={themeStyles.fontColorMain.color}
-                        titleColor={themeStyles.fontColorMain.color}
-                        refreshing={refreshing}
-                        onRefresh={loadNotifications} />}
-                    ListFooterComponent={() => isLoadingMore ? <ActivityIndicator color={themeStyles.fontColorMain.color}></ActivityIndicator> : <View></View>}
+            globals.readonly ?
+                <View style={[{ alignItems: 'center', justifyContent: 'center' }, styles.listContainer, themeStyles.containerColorSub]}>
+                    <Text style={[themeStyles.fontColorMain]}>Notifications are not available in the read-only mode.</Text>
+                </View>
+                :
+                <View style={[styles.listContainer, themeStyles.containerColorSub]}>
+                    <FlatList
+                        data={this.state.notifications}
+                        keyExtractor={keyExtractor}
+                        renderItem={({ item }) => this.renderNotification(item)}
+                        onEndReached={this.loadMoreNotifications}
+                        onEndReachedThreshold={4}
+                        maxToRenderPerBatch={20}
+                        windowSize={20}
+                        refreshControl={<RefreshControl
+                            tintColor={themeStyles.fontColorMain.color}
+                            titleColor={themeStyles.fontColorMain.color}
+                            refreshing={this.state.refreshing}
+                            onRefresh={this.loadNotifications} />}
+                        ListFooterComponent={() => this.state.isLoadingMore ? <ActivityIndicator color={themeStyles.fontColorMain.color}></ActivityIndicator> : <View></View>}
 
-                />
-            </View>
+                    />
+                </View>
+    }
 }
 
 const styles = StyleSheet.create(

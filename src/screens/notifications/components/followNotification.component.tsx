@@ -1,16 +1,15 @@
 import { themeStyles } from "@styles/globalColors";
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions, Image } from 'react-native';
+import { View, Text, TouchableOpacity, Image } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-
-import { Profile, Notification } from '@types';
+import { Notification } from '@types';
 import { globalStyles } from "@styles/globalStyles";
 
 interface Props {
-    goToProfile: (p_userKey: string, p_username: string) => void,
-    notification: Notification
-    styles: any,
-    profile: any,
+    goToProfile: (p_userKey: string, p_username: string) => void;
+    notification: Notification;
+    styles: any;
+    profile: any;
 }
 
 export class FollowNotificationComponent extends React.Component<Props> {
@@ -34,11 +33,9 @@ export class FollowNotificationComponent extends React.Component<Props> {
                     activeOpacity={1}>
                     <Image style={this.props.styles.profilePic} source={{ uri: this.props.profile.ProfilePic }} />
                 </TouchableOpacity>
-
                 <View style={[this.props.styles.iconContainer, { backgroundColor: '#0377fc' }]}>
                     <MaterialCommunityIcons style={[{ marginLeft: 1 }]} name="account" size={15} color="white" />
                 </View>
-
                 <View style={this.props.styles.textContainer}>
                     <TouchableOpacity
                         style={this.props.styles.centerTextVertically}
@@ -48,11 +45,9 @@ export class FollowNotificationComponent extends React.Component<Props> {
                             this.props.notification.Metadata.FollowTxindexMetadata?.IsUnfollow ? 'unfollowed' : 'followed'
                         } </Text>
                     </TouchableOpacity>
-
                     <Text style={[globalStyles.fontWeight500, themeStyles.fontColorMain]}>{this.props.notification.Metadata.FollowTxindexMetadata?.IsUnfollow ? 'unfollowed' : 'followed'} you</Text>
                 </View>
             </TouchableOpacity>
         )
     }
-
 };

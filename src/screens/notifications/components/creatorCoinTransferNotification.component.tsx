@@ -2,21 +2,19 @@ import { themeStyles } from "@styles/globalColors";
 import React from "react";
 import { View, Text, TouchableOpacity, Image } from 'react-native';
 import { formatNumber } from '@services'
-
-
 import { Profile, Post, Notification } from '@types';
 import { globalStyles } from "@styles/globalStyles";
 import { FontAwesome } from '@expo/vector-icons';
 
 interface Props {
-    profile: Profile,
-    notification: Notification
-    goToProfile: (p_userKey: string, p_username: string) => void,
-    goToPost: (postHashCode: string) => void,
-    styles: any,
-    post: Post,
-
+    profile: Profile;
+    notification: Notification;
+    goToProfile: (p_userKey: string, p_username: string) => void;
+    goToPost: (postHashCode: string) => void;
+    styles: any;
+    post: Post;
 }
+
 export class CreatorCoinTransferNotificationComponent extends React.Component<Props> {
     constructor(props: Props) {
         super(props)
@@ -84,5 +82,4 @@ export class CreatorCoinTransferNotificationComponent extends React.Component<Pr
             </TouchableOpacity>
         )
     }
-
 };

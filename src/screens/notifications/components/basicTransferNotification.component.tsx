@@ -2,15 +2,14 @@ import { themeStyles } from "@styles/globalColors";
 import React from "react";
 import { View, Text, TouchableOpacity, Image } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
-
 import { Profile, Notification } from '@types';
 import { globalStyles } from "@styles/globalStyles";
 
 interface Props {
-    profile: Profile,
-    goToProfile: (p_userKey: string, p_username: string) => void,
-    styles: any,
-    notification: Notification
+    profile: Profile;
+    goToProfile: (p_userKey: string, p_username: string) => void;
+    styles: any;
+    notification: Notification;
 }
 
 export class BasicTransferNotificationComponent extends React.Component<Props> {

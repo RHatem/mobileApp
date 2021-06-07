@@ -1,26 +1,20 @@
 import { themeStyles } from "@styles/globalColors";
 import React from "react";
 import { View, Text, TouchableOpacity, Image } from 'react-native';
-
-
-
 import { Profile, Post, Notification } from '@types';
 import { globalStyles } from "@styles/globalStyles";
 import { FontAwesome } from '@expo/vector-icons';
 
 interface Props {
-    profile: Profile,
-    post: Post,
-    goToProfile: (p_userKey: string, p_username: string) => void,
-    goToPost: (parentPoshHashHex: string, postHashCode: string) => void,
-    postHashHex: string,
-    parentPoshHashHex: string,
-    notification: Notification,
-    styles: any,
+    profile: Profile;
+    post: Post;
+    goToProfile: (p_userKey: string, p_username: string) => void;
+    goToPost: (parentPoshHashHex: string, postHashCode: string) => void;
+    postHashHex: string;
+    parentPoshHashHex: string;
+    notification: Notification;
+    styles: any;
 }
-
-
-//Not found in the notifications
 
 export class PostMentionNotificationComponent extends React.Component<Props> {
     constructor(props: Props) {
@@ -43,11 +37,9 @@ export class PostMentionNotificationComponent extends React.Component<Props> {
                     activeOpacity={1}>
                     <Image style={this.props.styles.profilePic} source={{ uri: this.props.profile.ProfilePic }}></Image>
                 </TouchableOpacity>
-
                 <View style={[this.props.styles.iconContainer, { backgroundColor: '#fcba03' }]}>
                     <FontAwesome style={[{ marginLeft: 1 }]} name="commenting" size={12} color="white" />
                 </View>
-
                 <View style={this.props.styles.textContainer}>
                     <TouchableOpacity
                         style={this.props.styles.centerTextVertically}
@@ -62,5 +54,4 @@ export class PostMentionNotificationComponent extends React.Component<Props> {
             </TouchableOpacity>
         )
     }
-
 };

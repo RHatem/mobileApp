@@ -1,18 +1,16 @@
 import { themeStyles } from "@styles/globalColors";
 import React from "react";
 import { View, Text, TouchableOpacity, Image } from 'react-native';
-
 import { calculateBitCloutInUSD } from '@services';
-
 import { Profile, Notification } from '@types';
 import { globalStyles } from "@styles/globalStyles";
 import { FontAwesome } from '@expo/vector-icons';
 
 interface Props {
-    profile: Profile,
-    goToProfile: (p_userKey: string, p_username: string) => void,
-    styles: any,
-    notification: Notification
+    profile: Profile;
+    goToProfile: (p_userKey: string, p_username: string) => void;
+    styles: any;
+    notification: Notification;
 }
 
 export class CreatorCoinNotificationComponent extends React.Component<Props> {
@@ -58,5 +56,4 @@ export class CreatorCoinNotificationComponent extends React.Component<Props> {
             </TouchableOpacity>
         )
     }
-
 };
