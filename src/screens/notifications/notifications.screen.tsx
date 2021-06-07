@@ -79,9 +79,7 @@ export class NotificationsScreen extends React.Component<Props, State> {
                             if (this.mount) {
                                 this.setState({ notifications: p_response.Notifications ? p_response.Notifications : [] })
                                 this.setState({ profiles: p_response.ProfilesByPublicKey })
-                                this.setState({ posts: p_response.PostsByHash })
-                                this.setState({ isLoading: false })
-                                this.setState({ refreshing: false })
+                                this.setState({ isLoading: false, refreshing: false, posts: p_response.PostsByHash })
                             }
                         }
                     );
