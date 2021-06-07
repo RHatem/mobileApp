@@ -1,9 +1,6 @@
 import { themeStyles } from "@styles/globalColors";
 import React from "react";
 import { View, Text, TouchableOpacity, Image } from 'react-native';
-
-
-
 import { Profile, Post, Notification } from '@types';
 import { globalStyles } from "@styles/globalStyles";
 import { FontAwesome } from '@expo/vector-icons';

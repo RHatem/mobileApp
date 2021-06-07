@@ -14,7 +14,6 @@ import { PostMentionNotificationComponent } from './components/postMentionNotifi
 import { PostRecloutNotificationComponent } from './components/postRecloutNotification.component';
 import { NavigationProp } from '@react-navigation/native';
 
-
 interface Props {
     standardPublicKey: string;
     nonStandardPublicKey?: string;
@@ -36,7 +35,7 @@ interface State {
 
 export class NotificationsScreen extends React.Component<Props, State> {
 
-    private mount = true;
+    private _isMounted = true;
 
     constructor(props: Props) {
         super(props);
@@ -67,7 +66,7 @@ export class NotificationsScreen extends React.Component<Props, State> {
             return;
         }
 
-        if (this.mount) {
+        if (this._isMounted) {
             this.setState({ isLoading: true, });
         }
 
@@ -76,10 +75,14 @@ export class NotificationsScreen extends React.Component<Props, State> {
                 p_response => {
                     loadTickersAndExchangeRate().then(
                         () => {
-                            if (this.mount) {
-                                this.setState({ notifications: p_response.Notifications ? p_response.Notifications : [] })
-                                this.setState({ profiles: p_response.ProfilesByPublicKey })
-                                this.setState({ isLoading: false, refreshing: false, posts: p_response.PostsByHash })
+                            if (this._isMounted) {
+                                this.setState({
+                                    notifications: p_response.Notifications ? p_response.Notifications : [],
+                                    profiles: p_response.ProfilesByPublicKey,
+                                    isLoading: false,
+                                    refreshing: false,
+                                    posts: p_response.PostsByHash
+                                })
                             }
                         }
                     );
@@ -92,27 +95,27 @@ export class NotificationsScreen extends React.Component<Props, State> {
             const newLastNotificationIndex = this.state.notifications[this.state.notifications.length - 1].Index;
 
             if (newLastNotificationIndex !== 0) {
-                if (this.mount) {
+                if (this._isMounted) {
                     this.setState({ isLoadingMore: true })
                 }
 
                 api.getNotifications(globals.user.publicKey, newLastNotificationIndex - 1, 50).then(
                     p_response => {
-                        if (this.mount) {
+                        if (this._isMounted) {
                             const allNotifications = this.state.notifications.concat(p_response.Notifications)
-                            this.setState({
+                            this.setState((p_previousValue) => ({
                                 notifications: allNotifications,
                                 lastNotificationIndex: newLastNotificationIndex,
                                 isLoading: false,
-                                refreshing: false
-                            })
-                            this.setState((p_previousValue) => ({ profiles: Object.assign(p_previousValue, p_response.ProfilesByPublicKey) }))
-                            this.setState((p_previousValue) => ({ posts: Object.assign(p_previousValue, p_response.PostsByHash) }));
+                                refreshing: false,
+                                profiles: Object.assign(p_previousValue.profiles, p_response.ProfilesByPublicKey),
+                                posts: Object.assign(p_previousValue.posts, p_response.PostsByHash)
+                            }))
                         }
                     }
                 ).catch(p_error => globals.defaultHandleError(p_error)).finally(
                     () => {
-                        if (this.mount) {
+                        if (this._isMounted) {
                             this.setState({ isLoadingMore: false })
                         }
                     }
@@ -127,7 +130,7 @@ export class NotificationsScreen extends React.Component<Props, State> {
     }
 
     componentWillUnmount() {
-        this.mount = false
+        this._isMounted = false
     }
 
     goToProfile(p_userKey: string, p_username: string) {
