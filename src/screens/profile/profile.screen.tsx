@@ -446,13 +446,16 @@ export function ProfileScreen({ navigation, route }: any) {
                     renderItem={
                         () => <View style={styles.profileCardContainer}>
                             {
-                                !isLoggedInUser && !globals.readonly ?
-                                    <ProfileScreenOptionsComponent
-                                        publicKey={profile.PublicKeyBase58Check}
-                                        goToChat={goToChat}
-                                    ></ProfileScreenOptionsComponent>
+                                !globals.readonly ?
+                                    !isLoggedInUser ?
+                                        <ProfileScreenOptionsComponent
+                                            publicKey={profile.PublicKeyBase58Check}
+                                            goToChat={goToChat}
+                                        ></ProfileScreenOptionsComponent>
+                                        :
+                                        <OwnProfileOptionsComponent navigation={navigation} />
                                     :
-                                    <OwnProfileOptionsComponent navigation={navigation} />
+                                    undefined
                             }
                             <ProfileCard
                                 navigation={navigation}
