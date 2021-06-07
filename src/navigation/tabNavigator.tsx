@@ -5,7 +5,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Ionicons } from '@expo/vector-icons';
 import { ProfileScreen } from '@screens/profile/profile.screen';
-import { NotificationsScreen } from '@screens/notifications.screen';
+import { NotificationsScreen } from '@screens/notifications/notifications.screen';
 import { HomeScreen } from '@screens/home.screen';
 import { eventManager, globals, navigatorGlobals, settingsGlobals } from '@globals';
 import { themeStyles } from '@styles';
